@@ -1,0 +1,332 @@
+[
+  {
+    "district": "ADILABAD",
+    "population": 708972,
+    "urban_percent": 23.66,
+    "rural_percent": 76.34,
+    "sex_ratio": 989,
+    "area_km2": 4153,
+    "literacy_rate": 63.46,
+    "density": 170.71
+  },
+  {
+    "district": "BHADRADRI KOTHAGUDEM",
+    "population": 1069261,
+    "urban_percent": 31.71,
+    "rural_percent": 68.29,
+    "sex_ratio": 1008,
+    "area_km2": 7483,
+    "literacy_rate": 66.40,
+    "density": 142.89
+  },
+  {
+    "district": "HYDERABAD",
+    "population": 3943323,
+    "urban_percent": 100.0,
+    "rural_percent": 0.0,
+    "sex_ratio": 954,
+    "area_km2": 217,
+    "literacy_rate": 83.25,
+    "density": 18172.00
+  },
+  {
+    "district": "JAGTIAL",
+    "population": 985417,
+    "urban_percent": 22.46,
+    "rural_percent": 77.54,
+    "sex_ratio": 1036,
+    "area_km2": 2419,
+    "literacy_rate": 60.58,
+    "density": 407.36
+  },
+  {
+    "district": "JANGAON",
+    "population": 566376,
+    "urban_percent": 12.6,
+    "rural_percent": 87.4,
+    "sex_ratio": 997,
+    "area_km2": 2188,
+    "literacy_rate": 61.44,
+    "density": 258.86
+  },
+  {
+    "district": "JAYASHANKAR BHUPALPALLY",
+    "population": 711434,
+    "urban_percent": 7.57,
+    "rural_percent": 92.43,
+    "sex_ratio": 1009,
+    "area_km2": 6175,
+    "literacy_rate": 60.31,
+    "density": 115.21
+  },
+  {
+    "district": "JOGULAMBA GADWAL",
+    "population": 609990,
+    "urban_percent": 10.36,
+    "rural_percent": 89.64,
+    "sex_ratio": 972,
+    "area_km2": 2928,
+    "literacy_rate": 49.87,
+    "density": 208.33
+  },
+  {
+    "district": "KAMAREDDY",
+    "population": 972625,
+    "urban_percent": 12.71,
+    "rural_percent": 87.29,
+    "sex_ratio": 1033,
+    "area_km2": 3652,
+    "literacy_rate": 56.51,
+    "density": 266.33
+  },
+  {
+    "district": "KARIMNAGAR",
+    "population": 1005711,
+    "urban_percent": 30.72,
+    "rural_percent": 69.28,
+    "sex_ratio": 993,
+    "area_km2": 2128,
+    "literacy_rate": 69.16,
+    "density": 472.61
+  },
+  {
+    "district": "KHAMMAM",
+    "population": 1401639,
+    "urban_percent": 22.6,
+    "rural_percent": 77.4,
+    "sex_ratio": 1005,
+    "area_km2": 4360,
+    "literacy_rate": 65.95,
+    "density": 321.48
+  },
+  {
+    "district": "KOMARAM BHEEM ASIFABAD",
+    "population": 515812,
+    "urban_percent": 16.86,
+    "rural_percent": 83.14,
+    "sex_ratio": 998,
+    "area_km2": 4878,
+    "literacy_rate": 56.72,
+    "density": 105.74
+  },
+  {
+    "district": "MAHABUBABAD",
+    "population": 774549,
+    "urban_percent": 9.86,
+    "rural_percent": 90.14,
+    "sex_ratio": 996,
+    "area_km2": 2877,
+    "literacy_rate": 57.13,
+    "density": 269.22
+  },
+  {
+    "district": "MAHABUBNAGAR",
+    "population": 1486777,
+    "urban_percent": 20.73,
+    "rural_percent": 79.27,
+    "sex_ratio": 995,
+    "area_km2": 5285,
+    "literacy_rate": 55.04,
+    "density": 281.32 
+  },
+  {
+    "district": "MANCHERIAL",
+    "population": 807037,
+    "urban_percent": 43.85,
+    "rural_percent": 56.15,
+    "sex_ratio": 977,
+    "area_km2": 4016,
+    "literacy_rate": 64.35,
+    "density": 200.96
+  },
+  {
+    "district": "MEDAK",
+    "population": 767428,
+    "urban_percent": 7.67,
+    "rural_percent": 92.33,
+    "sex_ratio": 1027,
+    "area_km2": 2786,
+    "literacy_rate": 56.12,
+    "density": 275.46
+  },
+  {
+    "district": "MEDCHAL-MALKAJGIRI",
+    "population": 2440073,
+    "urban_percent": 91.4,
+    "rural_percent": 8.6,
+    "sex_ratio": 957,
+    "area_km2": 1084,
+    "literacy_rate": 82.50,
+    "density": 2250.99
+  },
+  {
+    "district": "MULUGU",
+    "population": 294671,
+    "urban_percent": 3.9,
+    "rural_percent": 96.1,
+    "sex_ratio": 1015,
+    "area_km2": 3881,
+    "literacy_rate": 63.57,
+    "density": 76
+  },
+  {
+    "district": "NARAYANPET",
+    "population": 566874,
+    "urban_percent": 14.86,
+    "rural_percent": 85.14,
+    "sex_ratio": 978,
+    "area_km2": 2336,
+    "literacy_rate": 49.93,
+    "density": 243
+  },
+  {
+    "district": "NAGARKURNOOL",
+    "population": 861766,
+    "urban_percent": 10.19,
+    "rural_percent": 89.81,
+    "sex_ratio": 968,
+    "area_km2": 6545,
+    "literacy_rate": 54.38,
+    "density": 131.67
+  },
+  {
+    "district": "NALGONDA",
+    "population": 1618416,
+    "urban_percent": 22.76,
+    "rural_percent": 77.24,
+    "sex_ratio": 978,
+    "area_km2": 7122,
+    "literacy_rate": 63.75,
+    "density": 227.23
+  },
+  {
+    "district": "NIRMAL",
+    "population": 709418,
+    "urban_percent": 21.38,
+    "rural_percent": 78.62,
+    "sex_ratio": 1046,
+    "area_km2": 3845,
+    "literacy_rate": 57.77,
+    "density": 184.50
+  },
+  {
+    "district": "NIZAMABAD",
+    "population": 1571022,
+    "urban_percent": 29.58,
+    "rural_percent": 70.42,
+    "sex_ratio": 1044,
+    "area_km2": 4288,
+    "literacy_rate": 64.25,
+    "density": 366.38
+  },
+  {
+    "district": "PEDDAPALLI",
+    "population": 795332,
+    "urban_percent": 38.22,
+    "rural_percent": 61.78,
+    "sex_ratio": 992,
+    "area_km2": 2236,
+    "literacy_rate": 65.52,
+    "density": 355.70
+  },
+  {
+    "district": "RAJANNA SIRCILLA",
+    "population": 552037,
+    "urban_percent": 21.17,
+    "rural_percent": 78.83,
+    "sex_ratio": 1014,
+    "area_km2": 2019,
+    "literacy_rate": 62.71,
+    "density": 273.42
+  },
+  {
+    "district": "RANGAREDDY",
+    "population": 2446265,
+    "urban_percent": 58.05,
+    "rural_percent": 41.95,
+    "sex_ratio": 950,
+    "area_km2": 5031,
+    "literacy_rate": 71.88,
+    "density": 486.24
+  },
+  {
+    "district": "SANGAREDDY",
+    "population": 1527628,
+    "urban_percent": 34.69,
+    "rural_percent": 65.31,
+    "sex_ratio": 965,
+    "area_km2": 4403,
+    "literacy_rate": 64.05,
+    "density": 346.95
+  },
+  {
+    "district": "SIDDIPET",
+    "population": 1012065,
+    "urban_percent": 13.74,
+    "rural_percent": 86.26,
+    "sex_ratio": 1008,
+    "area_km2": 3632,
+    "literacy_rate": 61.61,
+    "density": 278.65
+  },
+  {
+    "district": "SURYAPET",
+    "population": 1099560,
+    "urban_percent": 15.56,
+    "rural_percent": 84.44,
+    "sex_ratio": 996,
+    "area_km2": 3607,
+    "literacy_rate": 64.11,
+    "density": 304.84
+  },
+  {
+    "district": "VIKARABAD",
+    "population": 927140,
+    "urban_percent": 13.48,
+    "rural_percent": 86.52,
+    "sex_ratio": 1001,
+    "area_km2": 3386,
+    "literacy_rate": 57.91,
+    "density": 273.82
+  },
+  {
+    "district": "WANAPARTHY",
+    "population": 577758,
+    "urban_percent": 15.97,
+    "rural_percent": 84.03,
+    "sex_ratio": 960,
+    "area_km2": 2152,
+    "literacy_rate": 55.67,
+    "density": 268.47
+  },
+  {
+    "district": "WARANGAL RURAL",
+    "population": 718537,
+    "urban_percent": 6.99,
+    "rural_percent": 93.01,
+    "sex_ratio": 994,
+    "area_km2": 2175,
+    "literacy_rate": 57.06,
+    "density": 330.36 
+  },
+  {
+    "district": "HANAMKONDA (WARANGAL URBAN)",
+    "population": 1080858,
+    "urban_percent": 68.51,
+    "rural_percent": 31.49,
+    "sex_ratio": 997,
+    "area_km2": 1309,
+    "literacy_rate": 76.17,
+    "density": 825.68
+  },
+  {
+    "district": "YADADRI BHUVANAGIRI",
+    "population": 739448,
+    "urban_percent": 16.66,
+    "rural_percent": 83.34,
+    "sex_ratio": 973,
+    "area_km2": 3092,
+    "literacy_rate": 65.53,
+    "density": 239.15
+  }
+]
