@@ -1,6 +1,7 @@
 // src/components/Drawer.js
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronUp, ChevronDown } from "lucide-react";
+import RadarChart from "./RadarChart";
 
 function Drawer({ district, isExpanded, setIsExpanded }) {
   // ---- ALL REACT HOOKS MUST BE DECLARED AT THE TOP LEVEL AND UNCONDITIONALLY ----
@@ -111,15 +112,7 @@ function Drawer({ district, isExpanded, setIsExpanded }) {
                   <h2 className="text-3xl font-extrabold text-pink-400 mb-6 text-left leading-tight"> {/* Larger, left-aligned title */}
                       {district.district}
                   </h2>
-                  <ul className="text-sm space-y-2 text-gray-300"> {/* Adjusted text color for contrast */}
-                      <li><strong>Population:</strong> {district.population.toLocaleString()}</li>
-                      <li><strong>Density:</strong> {district.density} per km²</li>
-                      <li><strong>Area:</strong> {district.area_km2} km²</li>
-                      <li><strong>Literacy:</strong> {district.literacy_rate}%</li>
-                      <li><strong>Sex Ratio:</strong> {district.sex_ratio}</li>
-                      <li><strong>Urban Pop:</strong> {district.urban_percent}%</li>
-                      <li><strong>Rural Pop:</strong> {district.rural_percent}%</li>
-                  </ul>
+                  <RadarChart district={district} />
               </div>
 
               {/* Right Pane: Gemini Chat Section (75%) */}
