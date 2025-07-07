@@ -1,0 +1,87 @@
+# Telangana Atlas - Project Architecture and Current Features (June 2025)
+
+## 🔧 Overview
+Telangana Atlas is a full-stack interactive mapping application built using:
+- **Frontend**: React + TailwindCSS + MapboxGL
+- **Backend/Services**: Firebase (Firestore, Storage, Auth)
+- **Map Source**: Custom `telangana_districts.geojson` polygons
+
+It enables users to:
+- Explore district-level data visually
+- Select a district to open context-specific panels
+- Drop pins on the map tied to user-submitted posts ("Charcha")
+- Upload text and media content (image/video) with their pins
+
+---
+
+## 🗂️ Key Directory Structure
+
+### `/frontend`
+- `src/`
+  - `App.js`: App root, manages global state (selected district, pin state, auth)
+  - `Map.js`: Main map using MapboxGL, renders districts, pins, and handles pin placement
+  - `components/`
+    - `FloatingToolBar.js`: Top-right tab selector (Charcha, Stats, Gemini, etc.)
+    - `DistrictCharchaPanel.js`: Post feed UI with media, pin placement, hover zoom
+    - `DistrictStatsPanel.js`, `ComparePanel.js`, `GeminiChatPanel.js`, etc.
+  - `firebase.js`: Firebase initialization (auth, db, storage)
+
+- `public/`
+  - `telangana_districts.geojson`: Polygon data for all districts
+
+### Firebase Services
+- `charcha/{district}/posts`: Firestore path for storing posts by district
+- `storage/charcha_media/{district}/{filename}`: Media uploads
+- Auth: Used to identify user by UID + email username
+
+---
+
+## ✅ Core Features Implemented
+
+### 🌐 District Selection
+- Clickable polygons from `geojson`
+- Highlights selected district + pans/zooms to fit bounds
+
+### 📍 Pin System
+- Users can click “Attach Pin” in Charcha to enter pin placement mode
+- Pins get dropped on click inside selected district
+- Pins store lat/lng with post, saved to Firestore
+
+### 📝 Charcha Feed
+- Posts shown per district with user, text, optional pin location, and timestamp
+- Upload image/video (stored in Firebase Storage)
+- Image: Zoom on hover + full-width preview
+- Video: Embedded player
+
+### 🗺️ Map Pins
+- Rendered using `symbol` layer with MapboxGL
+- Clicking pin shows mini popup preview
+- Also triggers scroll-to-post inside Charcha tab
+
+---
+
+## 🧠 Planned Final Features
+
+### 1. 🌤️ Weather Widget (per district)
+- Display current weather when district selected
+- API: OpenWeatherMap or similar
+- Fields: temp, icon, humidity, description
+
+### 2. 💬 Charcha Interactivity
+- Add upvote/downvote buttons per post
+- Add ability to comment on a post (threaded replies in Firestore)
+- Track engagement by user
+
+---
+
+## 🔐 Auth
+- Firebase Auth controls all post/media access
+- Authenticated users only
+
+---
+
+## 💡 Notes for Future Chats
+- Ask only for incremental updates to this existing architecture
+- Do NOT reset Firebase paths, map sources, or Mapbox structure unless explicitly discussed
+- MapboxGL is to remain the mapping solution for this MVP
+- This project is being built with strong real-world UX focus (mobile responsiveness, polish, etc.)
