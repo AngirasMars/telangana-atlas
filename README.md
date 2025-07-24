@@ -1,1 +1,2 @@
-"# Telangana Atlas" 
+WELCOME TO TELANGANA ATLAS. 
+
