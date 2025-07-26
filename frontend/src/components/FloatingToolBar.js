@@ -15,7 +15,9 @@ const FloatingToolBar = ({
   isPlacingPin,
   setIsPlacingPin,
   pendingPinCoords,
-  setPendingPinCoords
+  setPendingPinCoords,
+  selectedPinType,
+  setSelectedPinType
 }) => {
   const [selectedTabIndex, setSelectedTabIndex] = useState(null); // null = no tab open
 
@@ -96,6 +98,8 @@ const FloatingToolBar = ({
             setIsPlacingPin={setIsPlacingPin}
             pendingPinCoords={pendingPinCoords}
             setPendingPinCoords={setPendingPinCoords}
+            selectedPinType={selectedPinType}
+            setSelectedPinType={setSelectedPinType}
           />
         </FloatingPanel>
       ),

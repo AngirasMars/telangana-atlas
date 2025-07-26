@@ -1,6 +1,7 @@
 // src/components/DistrictCharchaPanel.js
 import React, { useEffect, useState, useRef } from "react";
-import { db, auth, storage } from "../firebase";
+import { db, storage } from "../components/firebase_keys";
+import { getAuth } from "firebase/auth";
 import {
   collection,
   addDoc,
@@ -13,13 +14,17 @@ import {
   deleteDoc
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
+// Remove: import ReactMarkdown from "react-markdown";
 
 const DistrictCharchaPanel = ({
   district,
   isPlacingPin,
   setIsPlacingPin,
+  
   pendingPinCoords,
   setPendingPinCoords,
+  selectedPinType,
+  setSelectedPinType,
 }) => {
   const [text, setText] = useState("");
   const [media, setMedia] = useState(null);
@@ -30,12 +35,12 @@ const DistrictCharchaPanel = ({
   const [replyText, setReplyText] = useState({});
   const [replyingTo, setReplyingTo] = useState({});
   const [commentUnsubscribers, setCommentUnsubscribers] = useState([]);
-  const [selectedPinType, setSelectedPinType] = useState("live");
+
   const postRefs = useRef({});
 
   // Added handleDeletePost function
   const handleDeletePost = async (post) => {
-    const user = auth.currentUser;
+    const user = getAuth().currentUser;
     if (!user || user.uid !== post.userId) return;
 
     const confirmed = window.confirm("Are you sure you want to delete this post?");
@@ -99,7 +104,7 @@ const DistrictCharchaPanel = ({
   }, []);
 
   const handlePost = async () => {
-    const user = auth.currentUser;
+    const user = getAuth().currentUser;
     if (!text.trim() || !user || !district?.district) return;
 
     try {
@@ -129,6 +134,11 @@ const DistrictCharchaPanel = ({
       }
 
       await addDoc(collection(db, "charcha", district.district, "posts"), postData);
+
+      // Dispatch refresh-pins event to update map pins immediately
+      window.dispatchEvent(new CustomEvent("refresh-pins", {
+        detail: { district: district.district }
+      }));
 
       setText("");
       setMedia(null);
@@ -240,7 +250,7 @@ const DistrictCharchaPanel = ({
   }, [district?.district]);
 
   const handleVote = async (postId, voteValue) => {
-    const user = auth.currentUser;
+    const user = getAuth().currentUser;
     if (!user) return;
 
     const postRef = doc(db, "charcha", district.district, "posts", postId);
@@ -263,7 +273,7 @@ const DistrictCharchaPanel = ({
   };
 
   const handleAddComment = async (postId) => {
-    const user = auth.currentUser;
+    const user = getAuth().currentUser;
     const text = commentText[postId];
     if (!user || !text?.trim()) return;
 
@@ -280,7 +290,7 @@ const DistrictCharchaPanel = ({
   };
 
   const handleAddReply = async (postId, commentId) => {
-    const user = auth.currentUser;
+    const user = getAuth().currentUser;
     const text = replyText[commentId];
     if (!user || !text?.trim()) return;
 
@@ -343,8 +353,8 @@ const DistrictCharchaPanel = ({
           <p className="text-xs text-gray-400">📁 Attached: {media.name}</p>
         )}
         
-        {/* Pin Type Selection */}
-        {pendingPinCoords && (
+        {/* Pin Type Selection - Show immediately after clicking Attach Pin */}
+        {isPlacingPin && !pendingPinCoords && (
           <div className="space-y-2">
             <label className="text-sm text-gray-300">Pin Type:</label>
             <select
@@ -352,8 +362,8 @@ const DistrictCharchaPanel = ({
               onChange={(e) => setSelectedPinType(e.target.value)}
               className="bg-gray-800 text-white p-2 rounded border border-gray-600"
             >
-              <option value="persistent">Persistent</option>
-              <option value="live">Live</option>
+              <option value="persistent">🟡 Persistent</option>
+              <option value="live">🔴 Live</option>
             </select>
           </div>
         )}
@@ -393,12 +403,12 @@ const DistrictCharchaPanel = ({
                 if (post.lat && post.lng) {
                   window.dispatchEvent(
                     new CustomEvent("fly-to-pin", {
-                      detail: { lat: post.lat, lng: post.lng },
+                      detail: { lat: post.lat, lng: post.lng, postId: post.id },
                     })
                   );
                 }
               }}
-              className="bg-gray-800 border border-gray-700 p-4 rounded-lg space-y-2 cursor-pointer hover:ring hover:ring-pink-400"
+              className="bg-gray-800 border border-gray-700 p-4 rounded-lg space-y-2 hover:ring hover:ring-pink-400"
             >
               {/* Added Delete Button */}
               <div className="flex justify-between">
@@ -407,7 +417,7 @@ const DistrictCharchaPanel = ({
                   <span className="text-xs text-gray-500">
                     {post.timestamp?.toDate()?.toLocaleString() || "Just now"}
                   </span>
-                  {auth.currentUser?.uid === post.userId && (
+                  {getAuth().currentUser?.uid === post.userId && (
                     <button
                       onClick={() => handleDeletePost(post)}
                       className="text-xs text-red-400 hover:text-red-500"
@@ -418,110 +428,141 @@ const DistrictCharchaPanel = ({
                 </div>
               </div>
               
-              <div className="flex flex-col items-center w-8 float-left mr-2">
-                <button onClick={() => handleVote(post.id, 1)}>▲</button>
-                <span>{post.voteCount || 0}</span>
-                <button onClick={() => handleVote(post.id, -1)}>▼</button>
-              </div>
-              <div className="ml-10">
-                <p className="text-gray-100">{post.text}</p>
-                {post.lat && post.lng && (
-                  <p className="text-xs text-gray-400 italic">
-                    📍 {post.lat.toFixed(3)}, {post.lng.toFixed(3)}
-                  </p>
-                )}
-                {post.mediaURL && post.mediaType === "image" && (
-                  <div className="mt-2 overflow-hidden rounded-md border border-gray-600 shadow max-h-[75vh]">
-                    <img
-                      src={post.mediaURL}
-                      alt="Post"
-                      className="w-full object-cover transition-transform duration-300 ease-in-out transform hover:scale-125"
-                      style={{ maxHeight: "100%", height: "auto" }}
-                    />
-                  </div>
-                )}
-                {post.mediaURL && post.mediaType === "video" && (
-                  <video src={post.mediaURL} controls className="w-full mt-2 rounded" />
-                )}
-
-                <div className="mt-3 space-y-1">
-                  <textarea
-                    placeholder="Add a comment..."
-                    value={commentText[post.id] || ""}
-                    onChange={(e) =>
-                      setCommentText((prev) => ({ ...prev, [post.id]: e.target.value }))
-                    }
-                    className="w-full p-2 bg-gray-700 text-sm rounded"
-                    rows={2}
-                  />
+              <div className="flex flex-row items-start gap-4">
+                {/* Vote block on the left */}
+                <div className="flex flex-col items-center gap-1 pt-1">
                   <button
-                    onClick={() => handleAddComment(post.id)}
-                    className="text-sm bg-pink-600 hover:bg-pink-700 px-3 py-1 rounded"
+                    onClick={(e) => { e.stopPropagation(); handleVote(post.id, 1); }}
+                    className="text-gray-400 hover:text-green-400"
                   >
-                    Comment
+                    ▲
+                  </button>
+                  <span className="text-sm font-semibold">
+                    {post.voteCount || 0}
+                  </span>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleVote(post.id, -1); }}
+                    className="text-gray-400 hover:text-red-400"
+                  >
+                    ▼
                   </button>
                 </div>
+                {/* Post content on the right */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-gray-100">{post.text}</p>
+                  {post.lat && post.lng && (
+                    <div className="flex items-center gap-2">
+                      <p className="text-xs text-gray-400 italic">
+                        📍 {post.lat.toFixed(3)}, {post.lng.toFixed(3)}
+                      </p>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.dispatchEvent(
+                            new CustomEvent("start-triangle-mode", {
+                              detail: { lat: post.lat, lng: post.lng }
+                            })
+                          );
+                        }}
+                        className="text-xs bg-blue-600 hover:bg-blue-700 px-2 py-1 rounded text-white"
+                      >
+                        🧭 Navigate
+                      </button>
+                    </div>
+                  )}
+                  {post.mediaURL && post.mediaType === "image" && (
+                    <div className="mt-2 overflow-hidden rounded-md border border-gray-600 shadow max-h-[75vh]">
+                      <img
+                        src={post.mediaURL}
+                        alt="Post"
+                        className="w-full object-cover transition-transform duration-300 ease-in-out transform hover:scale-125"
+                        style={{ maxHeight: "100%", height: "auto" }}
+                      />
+                    </div>
+                  )}
+                  {post.mediaURL && post.mediaType === "video" && (
+                    <video src={post.mediaURL} controls className="w-full mt-2 rounded" />
+                  )}
 
-                {post.comments && post.comments.length > 0 && (
-                  <div className="mt-3 space-y-2 border-t border-gray-600 pt-2">
-                    {post.comments.map((comment) => (
-                      <div key={comment.id} className="text-sm space-y-1">
-                        <div>
-                          <span className="text-pink-300 font-semibold">@{comment.userName}</span>{" "}
-                          <span className="text-gray-300">{comment.text}</span>
-                          <span className="text-xs text-gray-500 ml-2">
-                            {comment.timestamp?.toDate()?.toLocaleString() || "Just now"}
-                          </span>
-                          <button
-                            onClick={() =>
-                              setReplyingTo((prev) => ({ ...prev, [comment.id]: true }))
-                            }
-                            className="ml-3 text-xs text-blue-400 hover:underline"
-                          >
-                            Reply
-                          </button>
-                        </div>
+                  <div className="mt-3 space-y-1">
+                    <textarea
+                      placeholder="Add a comment..."
+                      value={commentText[post.id] || ""}
+                      onChange={(e) =>
+                        setCommentText((prev) => ({ ...prev, [post.id]: e.target.value }))
+                      }
+                      className="w-full p-2 bg-gray-700 text-sm rounded"
+                      rows={2}
+                    />
+                    <button
+                      onClick={() => handleAddComment(post.id)}
+                      className="text-sm bg-pink-600 hover:bg-pink-700 px-3 py-1 rounded"
+                    >
+                      Comment
+                    </button>
+                  </div>
 
-                        {replyingTo[comment.id] && (
-                          <div className="ml-4 mt-1 space-y-1">
-                            <textarea
-                              value={replyText[comment.id] || ""}
-                              onChange={(e) =>
-                                setReplyText((prev) => ({
-                                  ...prev,
-                                  [comment.id]: e.target.value,
-                                }))
-                              }
-                              className="w-full p-2 bg-gray-700 text-sm rounded"
-                              rows={2}
-                              placeholder="Write a reply..."
-                            />
+                  {post.comments && post.comments.length > 0 && (
+                    <div className="mt-3 space-y-2 border-t border-gray-600 pt-2">
+                      {post.comments.map((comment) => (
+                        <div key={comment.id} className="text-sm space-y-1">
+                          <div>
+                            <span className="text-pink-300 font-semibold">@{comment.userName}</span>{" "}
+                            <span className="text-gray-300">{comment.text}</span>
+                            <span className="text-xs text-gray-500 ml-2">
+                              {comment.timestamp?.toDate()?.toLocaleString() || "Just now"}
+                            </span>
                             <button
-                              onClick={() => handleAddReply(post.id, comment.id)}
-                              className="text-sm bg-pink-600 hover:bg-pink-700 px-3 py-1 rounded"
+                              onClick={() =>
+                                setReplyingTo((prev) => ({ ...prev, [comment.id]: true }))
+                              }
+                              className="ml-3 text-xs text-blue-400 hover:underline"
                             >
                               Reply
                             </button>
                           </div>
-                        )}
 
-                        {comment.replies && comment.replies.length > 0 && (
-                          <div className="ml-6 mt-2 space-y-1 border-l border-gray-600 pl-2">
-                            {comment.replies.map((reply) => (
-                              <div key={reply.id} className="text-sm">
-                                <span className="text-blue-300 font-semibold">@{reply.userName}</span>{" "}
-                                <span className="text-gray-200">{reply.text}</span>
-                                <span className="text-xs text-gray-500 ml-2">
-                                  {reply.timestamp?.toDate()?.toLocaleString() || "Just now"}
-                                </span>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
+                          {replyingTo[comment.id] && (
+                            <div className="ml-4 mt-1 space-y-1">
+                              <textarea
+                                value={replyText[comment.id] || ""}
+                                onChange={(e) =>
+                                  setReplyText((prev) => ({
+                                    ...prev,
+                                    [comment.id]: e.target.value,
+                                  }))
+                                }
+                                className="w-full p-2 bg-gray-700 text-sm rounded"
+                                rows={2}
+                                placeholder="Write a reply..."
+                              />
+                              <button
+                                onClick={() => handleAddReply(post.id, comment.id)}
+                                className="text-sm bg-pink-600 hover:bg-pink-700 px-3 py-1 rounded"
+                              >
+                                Reply
+                              </button>
+                            </div>
+                          )}
+
+                          {comment.replies && comment.replies.length > 0 && (
+                            <div className="ml-6 mt-2 space-y-1 border-l border-gray-600 pl-2">
+                              {comment.replies.map((reply) => (
+                                <div key={reply.id} className="text-sm">
+                                  <span className="text-blue-300 font-semibold">@{reply.userName}</span>{" "}
+                                  <span className="text-gray-200">{reply.text}</span>
+                                  <span className="text-xs text-gray-500 ml-2">
+                                    {reply.timestamp?.toDate()?.toLocaleString() || "Just now"}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           ))

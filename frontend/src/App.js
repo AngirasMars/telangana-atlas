@@ -7,14 +7,20 @@ import GeminiAssistantButton from "./components/GeminiAssistantButton";
 import districtData from "./data/districts_enriched.json";
 import { useAuth } from "./contexts/AuthContext";
 import LoginOverlay from "./components/LoginOverlay";
+import { getAuth, signOut } from "firebase/auth";
 
 function App() {
-  const { currentUser, loading } = useAuth();
+  const { currentUser, loading } = useAuth(); // ✅ Correct hook usage
+
+  // ✅ Logging outside of JSX
+  console.log("🤖 useAuth result:", useAuth?.toString?.());
+  console.log("🧪 LoginOverlay component:", LoginOverlay);
 
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [searchResults, setSearchResults] = useState([]);
   const [isPlacingPin, setIsPlacingPin] = useState(false);
   const [pendingPinCoords, setPendingPinCoords] = useState(null);
+  const [selectedPinType, setSelectedPinType] = useState("live");
 
   const handleDistrictSelect = (district) => {
     setSelectedDistrict(district);
@@ -53,15 +59,15 @@ function App() {
       />
 
       <Map
-        key={isPlacingPin ? "pinmode" : "normal"} // 🔥 Forces remount when pin mode toggles
         selectedDistrict={selectedDistrict}
         setSelectedDistrict={handleDistrictSelect}
         isPlacingPin={isPlacingPin}
         onPinPlaced={(coords) => {
-          console.log("✅ App.js received pin from Map:", coords); // ✅ Add this
+          console.log("✅ App.js received pin from Map:", coords);
           setIsPlacingPin(false);
           setPendingPinCoords(coords);
         }}
+        selectedPinType={selectedPinType}
       />
 
       <FloatingToolBar
@@ -70,6 +76,8 @@ function App() {
         setIsPlacingPin={setIsPlacingPin}
         pendingPinCoords={pendingPinCoords}
         setPendingPinCoords={setPendingPinCoords}
+        selectedPinType={selectedPinType}
+        setSelectedPinType={setSelectedPinType}
       />
 
       <GeminiAssistantButton selectedDistrict={selectedDistrict} />
@@ -78,7 +86,11 @@ function App() {
       {currentUser && (
         <button
           className="absolute top-4 left-4 bg-red-600 px-3 py-1 rounded text-white z-50"
-          onClick={() => import("./firebase").then(({ auth }) => auth.signOut())}
+          onClick={() => {
+            signOut(getAuth())
+              .then(() => console.log("✅ Signed out"))
+              .catch((err) => console.error("❌ Logout failed:", err));
+          }}
         >
           Logout
         </button>

@@ -1,20 +1,45 @@
 // src/components/LoginOverlay.js
 import React, { useState } from "react";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  sendEmailVerification
+} from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../components/firebase_keys";
 
 const LoginOverlay = () => {
   const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
-  const [mode, setMode] = useState("login"); // or "signup"
+  const [confirmPass, setConfirmPass] = useState("");
+  const [username, setUsername] = useState("");
+  const [mode, setMode] = useState("login"); // 'login' or 'signup'
   const [error, setError] = useState("");
 
   const handleAuth = async () => {
     try {
-      if (mode === "login") {
-        await signInWithEmailAndPassword(auth, email, pass);
+      if (mode === "signup") {
+        if (pass !== confirmPass) {
+          setError("Passwords do not match");
+          return;
+        }
+        const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+        await sendEmailVerification(userCred.user);
+        const finalUsername = username || `anon${Math.floor(Math.random() * 10000)}`;
+        await setDoc(doc(db, "users", userCred.user.uid), {
+          email,
+          username: finalUsername,
+        });
+        setError("");
+        alert("Signup successful! Please verify your email before logging in.");
       } else {
-        await createUserWithEmailAndPassword(auth, email, pass);
+        const userCred = await signInWithEmailAndPassword(auth, email, pass);
+        if (!userCred.user.emailVerified) {
+          setError("Please verify your email before logging in.");
+          return;
+        }
+        setError("");
+        // Proceed to redirect or close overlay as needed
       }
     } catch (err) {
       setError(err.message);
@@ -37,9 +62,30 @@ const LoginOverlay = () => {
         <input
           type="password"
           placeholder="Password"
-          className="w-full mb-4 p-2 rounded text-black"
+          className="w-full mb-3 p-2 rounded text-black"
           onChange={(e) => setPass(e.target.value)}
         />
+        {mode === "signup" && (
+          <>
+            <input
+              type="text"
+              placeholder="Choose a username"
+              className="w-full mb-3 p-2 rounded text-black"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Confirm password"
+              className="w-full mb-4 p-2 rounded text-black"
+              value={confirmPass}
+              onChange={(e) => setConfirmPass(e.target.value)}
+            />
+          </>
+        )}
+        {mode !== "signup" && (
+          <div style={{ marginBottom: "1rem" }} />
+        )}
         <button
           onClick={handleAuth}
           className="bg-pink-600 w-full py-2 rounded hover:bg-pink-700 transition"
@@ -47,9 +93,9 @@ const LoginOverlay = () => {
           {mode === "login" ? "Login" : "Sign Up"}
         </button>
         <p className="text-center mt-4 text-sm">
-          {mode === "login" ? "New user?" : "Already have an account?"}{" "}
+          {mode === "login" ? "Don't have an account?" : "Already have an account?"}
           <button
-            className="text-pink-300 underline"
+            className="text-pink-300 underline ml-2"
             onClick={() => setMode(mode === "login" ? "signup" : "login")}
           >
             {mode === "login" ? "Sign up" : "Log in"}
