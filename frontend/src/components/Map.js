@@ -433,8 +433,13 @@ function Map({ setSelectedDistrict, selectedDistrict, isPlacingPin, onPinPlaced,
       if (pins && pins.length > 0) {
         const first = pins[0];
         map.current?.flyTo({ center: [first.lng, first.lat], zoom: 14, essential: true });
-        
-        // Force resize to refresh marker positions after animation
+
+        pins.forEach(pin => {
+          if (pin.postId) {
+            window.dispatchEvent(new CustomEvent("highlight-pin", { detail: { postId: pin.postId } }));
+          }
+        });
+
         setTimeout(() => {
           map.current?.resize();
         }, 500);

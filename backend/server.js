@@ -22,76 +22,53 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 app.post('/api/chat', async (req, res) => {
-  const { message, districtName, context } = req.body;
+  const { message } = req.body;
+  const msg = message.toLowerCase();
 
-  if (!message || !districtName) {
-    return res.status(400).json({ error: "Message and district name are required." });
-  }
+  // Basic manual match: floods in nacharam
+  if (msg.includes("floods") && msg.includes("nacharam")) {
+    const postsSnapshot = await firestore.collectionGroup("posts").get();
 
-  try {
-    const extractionPrompt = `
-You are a helpful assistant. Extract the location and incident type from this user query:
-"${message}"
-Respond ONLY with a JSON object like:
-{ "location": "<place>", "incident": "<type>" }
+    const pins = [];
+    postsSnapshot.forEach(doc => {
+      const post = doc.data();
+      console.log("🔥 Raw Post:", post); // print whole post
 
-If you can't extract both, use null values.
-    `;
+      const content = post.text || post.content || "";  // fallback
+      const tags = post.hashtags?.join(" ") || "";
+      const combined = `${content} ${tags}`.toLowerCase();
 
-    const extractionResult = await model.generateContent(extractionPrompt);
-    const extractionText = await extractionResult.response.text();
+      console.log("Post Text:", combined);
 
-    const match = extractionText.match(/\{[^}]+\}/);
-    let location = null, incident = null;
-
-    if (match) {
-      const parsed = JSON.parse(match[0]);
-      location = parsed.location;
-      incident = parsed.incident;
-    }
-
-    let pins = [];
-
-    if (location && incident) {
-      const postsSnapshot = await firestore.collection("posts").get();
-
-      postsSnapshot.forEach(doc => {
-        const post = doc.data();
-        const text = `${post.content} ${post.hashtags?.join(" ") || ""}`.toLowerCase();
-
-        if (text.includes(location.toLowerCase()) && text.includes(incident.toLowerCase())) {
-          pins.push({
-            lat: post.lat,
-            lng: post.lng,
-            content: post.content,
-          });
-        }
-      });
-    }
-
-    let replyPrompt;
-    if (context && context.length > 0) {
-      replyPrompt = `You are a Telangana-aware assistant helping a user. Based on this chat history:\n${context}\nTheir next message: "${message}"\nGive a helpful, conversational answer.`;
-    } else {
-      replyPrompt = `You are a Telangana-aware assistant. User message: "${message}"\nGive a short, friendly reply about the topic.`;
-    }
-
-    const finalResult = await model.generateContent(replyPrompt);
-    const replyText = await finalResult.response.text();
-
-    const pinSummary = (pins && pins.length > 0)
-      ? `Here are ${pins.length} pins that mention '${location}' and '${incident}'.`
-      : "";
-
-    res.json({
-      reply: pinSummary + "\n\n" + replyText,
-      pins,
+      if (combined.includes("nacharam") && combined.includes("floods")) {
+        console.log("✅ Match found for post:", doc.id);
+        pins.push({
+          lat: post.lat,
+          lng: post.lng,
+          postId: doc.id,
+        });
+      }
     });
 
-  } catch (error) {
-    console.error("Error in Gemini chat API:", error);
-    res.status(500).json({ error: "Something went wrong. Please try again." });
+    console.log("Total pins found:", pins.length); // 🐞 Debug: Count matches
+
+    if (pins.length > 0) {
+      return res.json({
+        message: `Found ${pins.length} real pins for floods in Nacharam. Flying you there now.`,
+        pins,
+      });
+    } else {
+      return res.json({
+        message: `Couldn't find any real pins for floods in Nacharam.`,
+        pins: [],
+      });
+    }
   }
+
+  return res.json({
+    message: `No known pattern matched. Try: 'floods in Nacharam'.`,
+    pins: []
+  });
 });
 
 // NEW ENDPOINT: Get matching pins with postId

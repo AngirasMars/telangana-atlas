@@ -28,47 +28,17 @@ const GeminiChatPanel = ({ selectedDistrict, isCompareMode, comparisonContext })
       });
 
       const data = await response.json();
-      const rawReply = data.reply;
 
-      const cleanedReply = rawReply.replace(/```json[\s\S]*?```/, "").trim();
-
-      setChatHistory(prev => [
-        ...prev,
-        ...(isSystem ? [] : [{ sender: "user", message }]),
-        { sender: "gemini", message: cleanedReply }
-      ]);
+      if (data.message) {
+        setChatHistory(prev => [
+          ...prev,
+          ...(isSystem ? [] : [{ sender: "user", message }]),
+          { sender: "gemini", message: data.message }
+        ]);
+      }
 
       if (data.pins && Array.isArray(data.pins) && data.pins.length > 0) {
         window.dispatchEvent(new CustomEvent("fly-to-pins", { detail: data.pins }));
-      }
-
-      const jsonMatch = rawReply.match(/```json\s*({[\s\S]*?})\s*```/);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[1]);
-        const location = parsed.location || "";
-        const incident = parsed.incident || "";
-
-        if (location || incident) {
-          (async () => {
-            const pinRes = await fetch("/api/get-matching-pins", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ location, incident })
-            });
-            const pinData = await pinRes.json();
-            
-            // Log pins for debugging
-            console.log("Gemini pins:", pinData.pins);
-
-            if (pinData.pins && pinData.pins.length > 0) {
-              window.dispatchEvent(
-                new CustomEvent("fly-to-pins", {
-                  detail: pinData.pins,
-                })
-              );
-            }
-          })();
-        }
       }
 
     } catch (err) {
